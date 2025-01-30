@@ -2,18 +2,18 @@ import { Request, Response } from "express";
 import TaskService from "../services/TaskService";
 
 class TaskController {
-  private TaskService: TaskService;
+  private taskService: TaskService;
 
-  constructor() {
-    this.TaskService = new TaskService();
+  constructor(taskService: TaskService) {
+    this.taskService = taskService;
   }
 
   async getTasks(req: Request, res: Response) {
-    console.log(req);
+    console.log(req.params.userId);
     try {
-      const id = req.params.id;
+      const id = req.params.userId;
 
-      const task = await this.TaskService.getAllTasks(id);
+      const task = await this.taskService.getAllTasks(id);
 
       res.status(200).json(task);
     } catch (err: any) {
@@ -28,15 +28,17 @@ class TaskController {
   }
 
   async saveTask(req: Request, res: Response) {
-    try {
-      const title = req.body;
-      const auth0Id = req.body;
+    const title = req.body.title;
+    const auth0Id = req.params.userId;
 
-      const task = await this.TaskService.createTask(title, auth0Id);
+    try {
+      const task = await this.taskService.createTask(title, auth0Id);
 
       res.status(201).json(task);
     } catch (err) {
       const error = err as Error;
+
+      console.log(error);
 
       if (error.message === "Already exists task") {
         res.status(400).json({ message: error.message });
@@ -52,12 +54,12 @@ class TaskController {
 
   async updateTask(req: Request, res: Response) {
     try {
-      const id = Number(req.params.taskId);
-      const auth0Id = req.params.auth0Id;
+      const id = Number(req.params.id);
+      const auth0Id = req.params.userId;
       const title = req.body.title;
       const completed = req.body.completed;
 
-      const task = await this.TaskService.updateTask({
+      const task = await this.taskService.updateTask({
         id,
         auth0Id,
         title,
@@ -74,11 +76,11 @@ class TaskController {
   }
 
   async deleteTask(req: Request, res: Response) {
-    const id = Number(req.body.id);
-    const auth0Id = req.body.auth0Id;
+    const id = Number(req.params.id);
+    const auth0Id = req.params.auth0Id;
 
     try {
-      await this.TaskService.deleteTask({ id, auth0Id });
+      await this.taskService.deleteTask({ id, auth0Id });
 
       res.status(200).json({ message: "Success" });
     } catch (err) {
@@ -89,4 +91,4 @@ class TaskController {
   }
 }
 
-export default new TaskController();
+export default TaskController;

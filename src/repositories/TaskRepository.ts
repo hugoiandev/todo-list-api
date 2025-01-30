@@ -1,5 +1,4 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import ITask from "../models/TaskModel";
 import { TaskRepositoryEnum } from "../enums/TaskRepositoryEnum";
 
 class TaskRepository {
@@ -16,7 +15,7 @@ class TaskRepository {
         select: { id: true, title: true, completed: true },
       });
 
-      return tasks;
+      return await tasks;
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
         throw new Error(TaskRepositoryEnum.QueryError);

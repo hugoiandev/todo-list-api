@@ -3,16 +3,15 @@ import ITask from "../models/TaskModel";
 import TaskRepository from "../repositories/TaskRepository";
 
 class TaskService {
-  private taskService: TaskRepository;
+  private taskRepository: TaskRepository;
 
-  constructor() {
-    this.taskService = new TaskRepository();
-    this.getAllTasks;
+  constructor(taskRepository: TaskRepository) {
+    this.taskRepository = taskRepository;
   }
 
   async getAllTasks(auth0Id: string) {
     try {
-      return this.taskService.findAllById(auth0Id);
+      return this.taskRepository.findAllById(auth0Id);
     } catch (err) {
       const error = err as Error;
       if (error.message === TaskRepositoryEnum.QueryError) {
@@ -25,7 +24,7 @@ class TaskService {
 
   async createTask(title: string, auth0Id: string) {
     try {
-      return this.taskService.save(title, auth0Id);
+      return this.taskRepository.save(title, auth0Id);
     } catch (err) {
       const error = err as Error;
 
@@ -52,7 +51,7 @@ class TaskService {
     completed: boolean;
   }) {
     try {
-      return this.taskService.update({ id, auth0Id, title, completed });
+      return this.taskRepository.update({ id, auth0Id, title, completed });
     } catch (err) {
       const error = err as Error;
 
@@ -66,7 +65,7 @@ class TaskService {
 
   async deleteTask({ id, auth0Id }: { id: number; auth0Id: string }) {
     try {
-      return this.taskService.delete({ id, auth0Id });
+      return this.taskRepository.delete({ id, auth0Id });
     } catch (err) {
       const error = err as Error;
 

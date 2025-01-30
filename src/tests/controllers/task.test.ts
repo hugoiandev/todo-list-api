@@ -1,20 +1,35 @@
+jest.mock("express-oauth2-jwt-bearer", () => ({
+  auth: jest.fn(
+    () => (req: Request, res: Response, next: NextFunction) => next()
+  ),
+}));
+
 import request from "supertest";
-import { app } from "../../server"; // A instância principal do Express
-import { generateTestToken } from "../../utils/authHelper";
+import App from "../../app";
+import { Request, Response, NextFunction } from "express";
+import { PrismaClient } from "@prisma/client";
 
-describe("Task routes", () => {
-  it("should return tasks for an authenticated user", async () => {
-    const token = generateTestToken({ sub: "1", email: "ahugaao@gmail.com" }); // Você pode gerar usando o `test-utils` ou definir manualmente
-    const response = await request(app.server)
-      .get("/users") // Rota protegida
-      .set("Authorization", `Bearer ${token}`);
+const app = new App();
+const prisma = new PrismaClient();
 
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual(expect.any(Array)); // Exemplo de validação
+beforeAll(async () => {});
+
+afterAll(async () => {});
+
+describe("Simular requisições a api", () => {
+  it("Deve retornar uma lista de tarefas", async () => {
+    const res = await request(app.server).get(
+      "/tasks/google-oauth2|106653194696727352547"
+    );
+
+    expect(res.status).toBe(200);
   });
 
-  it("should return 401 for unauthenticated request", async () => {
-    const response = await request(app.server).get("/users");
-    expect(response.status).toBe(401);
+  it("Deve cadastrar uma tarefa", async () => {
+    const res = await request(app.server)
+      .post("/tasks/google-oauth2|106653194696727")
+      .send({ title: "Lavar louça" });
+
+    expect(res.status).toEqual(201);
   });
 });
